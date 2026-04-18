@@ -1,51 +1,61 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Interact : MonoBehaviour
 {
-    // слой, на котором расположены объекты, с которыми можно взаимодействовать
     public LayerMask interactLayer;
-    // расстояние, на котором персонаж сможет взаимодействовать с объектом
-    public float interactDistance;
-    // картинка, которая будет появляться, при попадании луча на объект
+    public float interactDistance = 3f;
     public Image interactIcon;
 
     void Start()
     {
-        // отключаем иконку
-        interactIcon.enabled = false;
+        // Принудительно скрываем курсор в начале, чтобы Raycast заработал
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (interactIcon != null) interactIcon.enabled = false;
     }
 
     void Update()
     {
-        // создаем луч и указываем откуда он должен быть запущен и в каком направлении
+        // Если открыта панель сейфа (курсор виден), просто выключаем иконку, 
+        // но НЕ выходим из метода через return, чтобы не ломать логику.
+        if (Cursor.visible)
+        {
+            if (interactIcon != null) interactIcon.enabled = false;
+        }
+
         Ray ray = new Ray(transform.position, transform.forward);
-        // переменная для хранения информации о том объекте, в который попадет луч
         RaycastHit hit;
 
-        // если луч коснулся чего-то
+        // РИСУЕМ ЛУЧ в окне Scene (красная линия). Если она не долетает до сейфа — увеличь Distance.
+        Debug.DrawRay(ray.origin, ray.direction * interactDistance, Color.red);
+
         if (Physics.Raycast(ray, out hit, interactDistance, interactLayer))
         {
-            // включаем иконку
-            interactIcon.enabled = true;
+            // ЛОГ В КОНСОЛЬ: покажет имя объекта, в который попал луч
+            // Debug.Log("Вижу объект: " + hit.collider.name);
 
-            // если нажата клавиша E
+            if (!Cursor.visible && interactIcon != null)
+                interactIcon.enabled = true;
+
             if (Input.GetKeyDown(KeyCode.E))
             {
-                // если tag объекта Battery
-                if (hit.collider.tag == "Battery")
+                if (hit.collider.CompareTag("Battery"))
                 {
-                    // активируем метод подбора
-                    hit.collider.GetComponent<Battery>().UseBattery();
+                    var battery = hit.collider.GetComponent<Battery>();
+                    if (battery != null) battery.UseBattery();
+                }
+                else if (hit.collider.CompareTag("SafeBox"))
+                {
+                    var safe = hit.collider.GetComponent<SafeBox>();
+                    if (safe != null) safe.ShowPanel();
                 }
             }
         }
         else
         {
-            // выключаем иконку
-            interactIcon.enabled = false;
+            if (interactIcon != null) interactIcon.enabled = false;
         }
     }
 }

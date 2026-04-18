@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CinemachineTarget
   - Battery
+  - SafeBox
   layers:
   - Default
   - TransparentFX
@@ -13,7 +14,7 @@ TagManager:
   - Interactable
   - Water
   - UI
-  - 
+  - Player
   - 
   - 
   - 
