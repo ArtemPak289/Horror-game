@@ -2293,8 +2293,6 @@ MonoBehaviour:
   safeBoxCase: {fileID: 772137013}
   safeBoxOpenAngle: 90
   smooth: 2
-  statusText: {fileID: 492279477}
-  screamer: {fileID: 1568237863}
 --- !u!65 &1267743598
 BoxCollider:
   m_ObjectHideFlags: 0
